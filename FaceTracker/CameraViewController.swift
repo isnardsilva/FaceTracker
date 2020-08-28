@@ -29,6 +29,7 @@ public class CameraViewController: UIViewController {
         
         self.addCameraInput()
         self.showCameraFeed()
+        self.getCameraFrames()
         self.session.startRunning()
     }
     
@@ -77,5 +78,30 @@ extension CameraViewController {
         self.previewLayer.videoGravity = .resizeAspectFill
         self.previewLayer.frame = self.view.frame
         self.view.layer.insertSublayer(self.previewLayer, at: 0)
+    }
+    
+    /// Add an input to the camera session that takes the live camera frames
+    private func getCameraFrames() {
+        // Indicating that an output will be added to the camera session
+        self.session.beginConfiguration()
+        
+        // Create the video data output
+        let videoOutput = AVCaptureVideoDataOutput()
+        videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "camera_frame_processing_queue"))
+        videoOutput.alwaysDiscardsLateVideoFrames = true
+        videoOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+        
+        // Add the video output to the capture session
+        self.session.addOutput(videoOutput)
+        
+        // Indicating that an output was be added to the camera session
+        self.session.commitConfiguration()
+    }
+}
+
+// MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
+extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
+    public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        print("Frame received.")
     }
 }
