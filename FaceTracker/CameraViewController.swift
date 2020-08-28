@@ -15,29 +15,25 @@ public class CameraViewController: UIViewController {
     
     
     // MARK: - Properties
+    // AVCapture variables to hold sequence data
+    
     /// Configure input devices (camera), output media, preview views
     /// and basic settings before capturing photos or video
-//    private let session = AVCaptureSession()
-//
-//    /// Display the camera feed
-//    private var previewLayer: AVCaptureVideoPreviewLayer!
-//
-//    private var captureDeviceResolution: CGSize = CGSize()
-    // AVCapture variables to hold sequence data
-    var session: AVCaptureSession?
-    var previewLayer: AVCaptureVideoPreviewLayer?
+    private var session: AVCaptureSession?
+    /// Display the camera feed
+    private var previewLayer: AVCaptureVideoPreviewLayer?
     
-    var videoDataOutput: AVCaptureVideoDataOutput?
-    var videoDataOutputQueue: DispatchQueue?
+    private var videoDataOutput: AVCaptureVideoDataOutput?
+    private var videoDataOutputQueue: DispatchQueue?
     
-    var captureDevice: AVCaptureDevice?
-    var captureDeviceResolution: CGSize = CGSize()
+    private var captureDevice: AVCaptureDevice?
+    private var captureDeviceResolution: CGSize = CGSize()
     
     // Layer UI for drawing Vision results
-    var rootLayer: CALayer?
-    var detectionOverlayLayer: CALayer?
-    var detectedFaceRectangleShapeLayer: CAShapeLayer?
-    var detectedFaceLandmarksShapeLayer: CAShapeLayer?
+    private var rootLayer: CALayer?
+    private var detectionOverlayLayer: CALayer?
+    private var detectedFaceRectangleShapeLayer: CAShapeLayer?
+    private var detectedFaceLandmarksShapeLayer: CAShapeLayer?
     
     // Vision requests
     private var detectionRequests: [VNDetectFaceRectanglesRequest]?
@@ -100,7 +96,7 @@ extension CameraViewController: UIImagePickerControllerDelegate, UINavigationCon
 
 // MARK: - AVCapture Setup
 extension CameraViewController {
-    fileprivate func setupAVCaptureSession() -> AVCaptureSession? {
+    private func setupAVCaptureSession() -> AVCaptureSession? {
         let captureSession = AVCaptureSession()
         do {
             let inputDevice = try self.configureFrontCamera(for: captureSession)
@@ -120,8 +116,7 @@ extension CameraViewController {
         return nil
     }
     
-    /// - Tag: ConfigureDeviceResolution
-    fileprivate func highestResolution420Format(for device: AVCaptureDevice) -> (format: AVCaptureDevice.Format, resolution: CGSize)? {
+    private func highestResolution420Format(for device: AVCaptureDevice) -> (format: AVCaptureDevice.Format, resolution: CGSize)? {
         var highestResolutionFormat: AVCaptureDevice.Format? = nil
         var highestResolutionDimensions = CMVideoDimensions(width: 0, height: 0)
         
@@ -146,7 +141,7 @@ extension CameraViewController {
         return nil
     }
     
-    fileprivate func configureFrontCamera(for captureSession: AVCaptureSession) throws -> (device: AVCaptureDevice, resolution: CGSize) {
+    private func configureFrontCamera(for captureSession: AVCaptureSession) throws -> (device: AVCaptureDevice, resolution: CGSize) {
         let deviceDiscoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .front)
         
         if let device = deviceDiscoverySession.devices.first {
@@ -168,8 +163,7 @@ extension CameraViewController {
         throw NSError(domain: "ViewController", code: 1, userInfo: nil)
     }
     
-    /// - Tag: CreateSerialDispatchQueue
-    fileprivate func configureVideoDataOutput(for inputDevice: AVCaptureDevice, resolution: CGSize, captureSession: AVCaptureSession) {
+    private func configureVideoDataOutput(for inputDevice: AVCaptureDevice, resolution: CGSize, captureSession: AVCaptureSession) {
         
         let videoDataOutput = AVCaptureVideoDataOutput()
         videoDataOutput.alwaysDiscardsLateVideoFrames = true
@@ -198,8 +192,7 @@ extension CameraViewController {
         self.captureDeviceResolution = resolution
     }
     
-    /// - Tag: DesignatePreviewLayer
-    fileprivate func designatePreviewLayer(for captureSession: AVCaptureSession) {
+    private func designatePreviewLayer(for captureSession: AVCaptureSession) {
         let videoPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         self.previewLayer = videoPreviewLayer
         
@@ -211,18 +204,10 @@ extension CameraViewController {
         
         self.rootLayer = self.view.layer
         
-//        if let previewRootLayer = self.previewView?.layer {
-//            self.rootLayer = previewRootLayer
-//
-//            previewRootLayer.masksToBounds = true
-//            videoPreviewLayer.frame = previewRootLayer.bounds
-//            previewRootLayer.addSublayer(videoPreviewLayer)
-//        }
-        
     }
     
     // Removes infrastructure for AVCapture as part of cleanup.
-    fileprivate func teardownAVCapture() {
+    private func teardownAVCapture() {
         self.videoDataOutput = nil
         self.videoDataOutputQueue = nil
         
@@ -422,7 +407,7 @@ extension CameraViewController {
 
 // MARK: - Drawing Vision Observations
 extension CameraViewController {
-    fileprivate func setupVisionDrawingLayers() {
+    private func setupVisionDrawingLayers() {
         let captureDeviceResolution = self.captureDeviceResolution
         
         let captureDeviceBounds = CGRect(x: 0,
@@ -480,7 +465,7 @@ extension CameraViewController {
         self.updateLayerGeometry()
     }
     
-    fileprivate func updateLayerGeometry() {
+    private func updateLayerGeometry() {
         guard let overlayLayer = self.detectionOverlayLayer,
             let rootLayer = self.rootLayer,
             let previewLayer = self.previewLayer
@@ -529,7 +514,7 @@ extension CameraViewController {
         overlayLayer.position = CGPoint(x: rootLayerBounds.midX, y: rootLayerBounds.midY)
     }
     
-    fileprivate func addPoints(in landmarkRegion: VNFaceLandmarkRegion2D, to path: CGMutablePath, applying affineTransform: CGAffineTransform, closingWhenComplete closePath: Bool) {
+    private func addPoints(in landmarkRegion: VNFaceLandmarkRegion2D, to path: CGMutablePath, applying affineTransform: CGAffineTransform, closingWhenComplete closePath: Bool) {
         let pointCount = landmarkRegion.pointCount
         if pointCount > 1 {
             let points: [CGPoint] = landmarkRegion.normalizedPoints
@@ -542,7 +527,7 @@ extension CameraViewController {
         }
     }
     
-    fileprivate func addIndicators(to faceRectanglePath: CGMutablePath, faceLandmarksPath: CGMutablePath, for faceObservation: VNFaceObservation) {
+    private func addIndicators(to faceRectanglePath: CGMutablePath, faceLandmarksPath: CGMutablePath, for faceObservation: VNFaceObservation) {
         let displaySize = self.captureDeviceResolution
         
         let faceBounds = VNImageRectForNormalizedRect(faceObservation.boundingBox, Int(displaySize.width), Int(displaySize.height))
@@ -579,8 +564,7 @@ extension CameraViewController {
         }
     }
     
-    /// - Tag: DrawPaths
-    fileprivate func drawFaceObservations(_ faceObservations: [VNFaceObservation]) {
+    private func drawFaceObservations(_ faceObservations: [VNFaceObservation]) {
         guard let faceRectangleShapeLayer = self.detectedFaceRectangleShapeLayer,
             let faceLandmarksShapeLayer = self.detectedFaceLandmarksShapeLayer
             else {
