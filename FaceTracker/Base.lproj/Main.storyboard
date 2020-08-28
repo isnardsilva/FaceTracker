@@ -40,6 +40,9 @@
                                     <constraint firstAttribute="width" constant="40" id="miy-4A-7fY"/>
                                 </constraints>
                                 <state key="normal" backgroundImage="photo" catalog="system"/>
+                                <connections>
+                                    <action selector="openGallery:" destination="BYZ-38-t0r" eventType="touchUpInside" id="L9c-73-5zr"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
