@@ -21,20 +21,24 @@ public class CameraViewController: UIViewController {
     /// Display the camera feed
     private var previewLayer: AVCaptureVideoPreviewLayer!
     
+    private var selectedImage: UIImage?
     
     
     // MARK: - View Lifecycle
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.addCameraInput()
-        self.showCameraFeed()
-        self.getCameraFrames()
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         self.session.startRunning()
     }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Setup Camera
+        self.addCameraInput()
+        self.showCameraFeed()
+        self.getCameraFrames()
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
@@ -44,6 +48,33 @@ public class CameraViewController: UIViewController {
     
     
     // MARK: - Actions
+    @IBAction func openGallery(_ sender: UIButton) {
+        let picker = UIImagePickerController()
+        picker.delegate = self
+        picker.sourceType = .photoLibrary
+        self.present(picker, animated: true, completion: nil)
+    }
+    
+    
+    // MARK: - Navigation
+    public override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let imageVC = segue.destination as? ImageViewController {
+            imageVC.image = self.selectedImage
+        }
+    }
+}
+
+
+extension CameraViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+        
+        // Check if is a valid image
+        if let img = info[.originalImage] as? UIImage {
+            self.selectedImage = img
+            performSegue(withIdentifier: "showImageVC", sender: nil)
+        }
+    }
 }
 
 
