@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import Vision
 
 public class CameraViewController: UIViewController {
     // MARK: - Outlets
@@ -133,6 +134,42 @@ extension CameraViewController {
 // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
 extension CameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        print("Frame received.")
+//        print("Frame received.")
+        
+        // Check frames from the camera feed
+        guard let frame = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            print("unable to get image from sample buffer")
+            return
+        }
+        
+        // Detect face in frame
+        self.detectFace(in: frame)
+    }
+}
+
+// MARK: - Detect Face
+extension CameraViewController {
+    
+    private func detectFace(in image: CVPixelBuffer) {
+        let faceDetectionRequest = VNDetectFaceLandmarksRequest(completionHandler: { (request: VNRequest, error: Error?) in
+            
+            DispatchQueue.main.async {
+                if let results = request.results as? [VNFaceObservation] {
+                    print("Did detect \(results.count) face(s)")
+//                    self.handleFaceDetectionResults(results)
+                } else {
+//                    self.clearDrawings()
+                    print("No faces!")
+                }
+            }
+        })
+        
+        let imageRequestHandler = VNImageRequestHandler(cvPixelBuffer: image, orientation: .leftMirrored, options: [:])
+        try? imageRequestHandler.perform([faceDetectionRequest])
+    }
+    
+    // Drawing bounding box faces
+    private func handleFaceDetectionResults(_ observedFaces: [VNFaceObservation]) {
+        
     }
 }
