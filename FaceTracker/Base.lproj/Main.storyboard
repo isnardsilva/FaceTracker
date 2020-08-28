@@ -12,7 +12,6 @@
         <!--Navigation Controller-->
         <scene sceneID="j1S-dZ-Jvf">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="D0i-mo-rhj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <navigationController id="aCB-cb-NOB" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Lbh-yk-AY6">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -22,6 +21,7 @@
                         <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="H2J-bn-JxT"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="D0i-mo-rhj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1057" y="94"/>
         </scene>
@@ -40,9 +40,6 @@
                                     <constraint firstAttribute="width" constant="40" id="miy-4A-7fY"/>
                                 </constraints>
                                 <state key="normal" backgroundImage="photo" catalog="system"/>
-                                <connections>
-                                    <action selector="openGallery:" destination="BYZ-38-t0r" eventType="touchUpInside" id="LfM-59-MfP"/>
-                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
